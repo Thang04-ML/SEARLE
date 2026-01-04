@@ -1,0 +1,9 @@
+{
+    "exp_name": "GPTNeo27B",
+    "gpt_model": "EleutherAI/gpt-neo-2.7B",
+    "max_length": 35,
+    "no_repeat_ngram_size": 2,
+    "num_return_sequences": 256,
+    "resume_experiment": false,
+    "temperature": 0.5
+}
