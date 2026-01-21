@@ -216,59 +216,6 @@ print(f"similarity: {similarity.item():.2f}%")
 ```
 </details>
 
-<details>
-<summary><h2>SEARLE</h2></summary>
-
-This section provides instructions for reproducing the results of the SEARLE method.
-It covers the steps to train the textual inversion network and perform inference using the trained model.
-
-### 0. GPT phrases generation
-
-To perform both the optimization-based textual inversion and the training of the textual inversion network phi, we need to generate
-a set of phrases for each concept in the dictionary. The concepts are taken from
-the [Open Images V7 dataset](https://storage.googleapis.com/openimages/web/index.html).
-
-Run the following command to generate the phrases:
-
-```sh
-python src/gpt_phrases_generation.py
-```
-
-```
-    --exp-name <int>                Name of the experiment (default="GPTNeo27B")
-    --gpt-model <str>               GPT model to use (default="EleutherAI/gpt-neo-2.7B")
-    --max-length <int>              Maximum length of the generated phrases (default=35)
-    --num-return-sequences <int>    Number of generated phrases for each concept (default=256)
-    --temperature <float>           Temperature of the sampling (default=0.5)
-    --no-repeat-ngram-size <int>    Size of the n-gram to avoid repetitions (default=2)
-    --resume-experiment<store true> Resume the experiment if it exists (default=false)
-```
-
-Since the phrase generation process can be time-consuming, you can download the pre-generated phrases used in our
-experiments [**here**](https://github.com/miccunifi/SEARLE/releases/download/weights/GPTNeo27B.zip). After downloading, unzip the file in the `data/GPT_phrases` folder so that the
-folder structure matches the following: `data/GPT_phrases/GPTNeo27B/concept_to_phrases.pkl`
-
-### 1. Image concepts association
-
-We associate to each image a set of textual concepts taken from
-the [Open Images V7 dataset](https://storage.googleapis.com/openimages/web/index.html).
-
-Run the following command to associate concepts with the images:
-
-```sh
-python src/image_concepts_association.py --clip-model-name <str> --dataset imagenet --dataset-path <str> --split test
-```
-
-```
-    --clip-model-name <str>        CLIP model to use, e.g 'ViT-B/32', 'ViT-L/14'
-    --dataset-path <str>           Path to the ImageNet root folder
-    --batch-size <int>             Batch size (default=32)
-    --num-workers <int>            Number of workers (default=8)
-    --preprocess-type <str>        Preprocessing type, options: ['clip', 'targetpad'] (default=targetpad)
-```
-
-The associations will be saved in a CSV file located in the `data/similar_concept/imagenet/test` folder.
-
 ### 2. Optimization-based Textual Inversion (OTI)
 
 Perform the Optimization-based Textual Inversion on the ImageNet test set.
