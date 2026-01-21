@@ -1,64 +1,16 @@
-# SEARLE (ICCV 2023)
+# SEARLE - Zero-shot Composed Image Retrieval With Textual Inversion
 
-### Zero-shot Composed Image Retrieval With Textual Inversion
+## Tổng Quan
 
-[![arXiv](https://img.shields.io/badge/ICCV2023-Paper-<COLOR>.svg)](https://arxiv.org/abs/2303.15247)
-[![Generic badge](https://img.shields.io/badge/Demo-Link-blue.svg)](https://circo.micc.unifi.it/demo)
-[![Generic badge](https://img.shields.io/badge/Video-YouTube-red.svg)](https://www.youtube.com/watch?v=qxpNb9qxDQI)
-[![Generic badge](https://img.shields.io/badge/Slides-Link-orange.svg)](/assets/Slides.pptx)
-[![Generic badge](https://img.shields.io/badge/Poster-Link-purple.svg)](/assets/Poster.pdf)
-[![GitHub Stars](https://img.shields.io/github/stars/miccunifi/SEARLE?style=social)](https://github.com/miccunifi/SEARLE)
+SEARLE (zero-Shot composEd imAge Retrieval with textuaL invErsion) là một phương pháp cho Composed Image Retrieval (CIR) mà không yêu cầu tập dữ liệu huấn luyện có nhãn.
 
-🔥🔥 **[2024/05/07] The extended version of our ICCV 2023 paper is now public: [iSEARLE: Improving Textual Inversion for Zero-Shot Composed Image Retrieval
-](https://arxiv.org/abs/2405.02951). The code will be released upon acceptance.**
+**Ý tưởng chính:** Ánh xạ các đặc trưng hình ảnh của hình ảnh tham chiếu vào một token pseudo-word trong không gian nhúng token CLIP, sau đó tích hợp nó với chú thích tương đối.
 
-This is the **official repository** of the [**ICCV 2023 paper**](https://arxiv.org/abs/2303.15247) "*Zero-Shot Composed
-Image Retrieval with Textual Inversion*" and its [**extended version**](https://arxiv.org/abs/2405.02951) "*iSEARLE: Improving Textual Inversion for Zero-Shot Composed Image Retrieval*".
- 
-> You are currently viewing the code and model repository. If you are looking for more information about the
-> newly-proposed dataset **CIRCO** see the [repository](https://github.com/miccunifi/CIRCO).
-
-## Overview
-
-### Abstract
-
-Composed Image Retrieval (CIR) aims to retrieve a target image based on a query composed of a reference image and a
-relative caption that describes the difference between the two images. The high effort and cost required for labeling
-datasets for CIR hamper the widespread usage of existing methods, as they rely on supervised learning. In this work, we
-propose a new task, Zero-Shot CIR (ZS-CIR), that aims to address CIR without requiring a labeled training dataset. Our
-approach, named zero-Shot composEd imAge Retrieval with textuaL invErsion (SEARLE), maps the visual features of the
-reference image into a pseudo-word token in CLIP token embedding space and integrates it with the relative caption. To
-support research on ZS-CIR, we introduce an open-domain benchmarking dataset named Composed Image Retrieval on Common
-Objects in context (CIRCO), which is the first dataset for CIR containing multiple ground truths for each query. The
-experiments show that SEARLE exhibits better performance than the baselines on the two main datasets for CIR tasks,
-FashionIQ and CIRR, and on the proposed CIRCO.
+**Phương pháp:**
+- *Giai đoạn pre-training:* Tạo pseudo-word tokens từ hình ảnh không có nhãn bằng textual inversion dựa trên tối ưu, sau đó chưng cất kiến thức thành một mạng textual inversion.
+- *Giai đoạn inference:* Ánh xạ hình ảnh tham chiếu thành pseudo-word token, nối với chú thích tương đối, rồi sử dụng CLIP text encoder để thực hiện text-to-image retrieval.
 
 ![](assets/intro.png "Workflow of the method")
-
-Workflow of our method. *Top*: in the pre-training phase, we generate pseudo-word tokens of unlabeled images with an
-optimization-based textual inversion and then distill their knowledge to a textual inversion network. *Bottom*: at
-inference time on ZS-CIR, we map the reference image to a pseudo-word $S_*$ and concatenate it with the relative
-caption. Then, we use CLIP text encoder to perform text-to-image retrieval.
-
-## Citation
-```bibtex
-@article{agnolucci2024isearle,
-  title={iSEARLE: Improving Textual Inversion for Zero-Shot Composed Image Retrieval}, 
-  author={Agnolucci, Lorenzo and Baldrati, Alberto and Bertini, Marco and Del Bimbo, Alberto},
-  journal={arXiv preprint arXiv:2405.02951},
-  year={2024},
-}
-```
-
-```bibtex
-@inproceedings{baldrati2023zero,
-  title={Zero-Shot Composed Image Retrieval with Textual Inversion},
-  author={Baldrati, Alberto and Agnolucci, Lorenzo and Bertini, Marco and Del Bimbo, Alberto},
-  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
-  pages={15338--15347},
-  year={2023}
-}
-```
 
 <details>
 <summary><h2>Getting Started</h2></summary>
@@ -534,6 +486,38 @@ python src/generate_test_submission.py --submission-name <str> --exp-name <str> 
 
 The predictions file will be saved in the `data/test_submissions/{dataset}/` folder.
 </details>
+
+## Kết Quả Thực Nghiệm
+
+### Kết Quả trên FashionIQ (Recall@10 và Recall@50)
+
+| Phương pháp | Dresses (R@10) | Dresses (R@50) | Shirts (R@10) | Shirts (R@50) | Tops&Tees (R@10) | Tops&Tees (R@50) | Avg (R@10) | Avg (R@50) |
+|---|---|---|---|---|---|---|---|---|
+| **SEARLE** | 21.57 | 44.47 | 30.37 | 47.49 | 30.90 | 51.76 | 27.61 | 47.90 |
+| **FTI4CIR** | 24.39 | 47.84 | 31.35 | 50.59 | 32.43 | 54.21 | 29.39 | 50.88 |
+
+### Kết Quả trên FashionIQ (Thực Nghiệm)
+
+| Phương pháp | Dresses (R@10) | Dresses (R@50) | Shirts (R@10) | Shirts (R@50) | Tops&Tees (R@10) | Tops&Tees (R@50) | Avg (R@10) | Avg (R@50) |
+|---|---|---|---|---|---|---|---|---|
+| **SEARLE** | 17.50 | 35.94 | 22.76 | 40.18 | 25.22 | 46.46 | 21.83 | 40.86 |
+| **FTI4CIR** | 23.85 | 44.42 | 30.86 | 48.77 | 33.85 | 55.65 | 29.52 | 49.62 |
+
+### Kết Quả mAP trên FashionIQ
+
+| Phương pháp | Dresses (mAP@10) | Dresses (mAP@50) | Shirts (mAP@10) | Shirts (mAP@50) | Tops&Tees (mAP@10) | Tops&Tees (mAP@50) | Avg (mAP@10) | Avg (mAP@50) |
+|---|---|---|---|---|---|---|---|---|
+| **SEARLE** | 7.34 | 8.16 | 12.25 | 13.06 | 12.41 | 13.38 | 10.67 | 11.53 |
+| **FTI4CIR** | 11.33 | 12.27 | 15.66 | 16.49 | 18.31 | 19.33 | 15.10 | 16.03 |
+
+### Kết Quả Chi Tiết từ CSV
+
+| Danh Mục | Recall@10 | Recall@50 | mAP@10 | mAP@50 |
+|---|---|---|---|---|
+| **Shirt** | 22.77 | 40.19 | 12.25 | 13.05 |
+| **Dress** | 17.50 | 35.94 | 7.34 | 8.15 |
+| **Toptee** | 25.23 | 46.47 | 12.41 | 13.38 |
+| **Average** | 21.83 | 40.87 | 10.66 | 11.53 |
 
 ## Authors
 
